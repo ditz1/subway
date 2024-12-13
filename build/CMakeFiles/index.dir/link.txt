@@ -1,0 +1,1 @@
+/Users/daniel/emsdk/upstream/emscripten/em++          -s USE_GLFW=3         -s ASSERTIONS=1         -s WASM=1         -s ASYNCIFY         -s FORCE_FILESYSTEM=1         -s INITIAL_MEMORY=268435456         --preload-file ../assets @CMakeFiles/index.dir/objects1.rsp -o index.html @CMakeFiles/index.dir/linkLibs.rsp
