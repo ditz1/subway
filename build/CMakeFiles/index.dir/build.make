@@ -73,49 +73,46 @@ CMakeFiles/index.dir/codegen:
 .PHONY : CMakeFiles/index.dir/codegen
 
 CMakeFiles/index.dir/src/main.cpp.o: CMakeFiles/index.dir/flags.make
-CMakeFiles/index.dir/src/main.cpp.o: CMakeFiles/index.dir/includes_CXX.rsp
 CMakeFiles/index.dir/src/main.cpp.o: /Users/daniel/Code/subway/src/main.cpp
 CMakeFiles/index.dir/src/main.cpp.o: CMakeFiles/index.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/daniel/Code/subway/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/index.dir/src/main.cpp.o"
-	/Users/daniel/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/index.dir/src/main.cpp.o -MF CMakeFiles/index.dir/src/main.cpp.o.d -o CMakeFiles/index.dir/src/main.cpp.o -c /Users/daniel/Code/subway/src/main.cpp
+	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/index.dir/src/main.cpp.o -MF CMakeFiles/index.dir/src/main.cpp.o.d -o CMakeFiles/index.dir/src/main.cpp.o -c /Users/daniel/Code/subway/src/main.cpp
 
 CMakeFiles/index.dir/src/main.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/index.dir/src/main.cpp.i"
-	/Users/daniel/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/daniel/Code/subway/src/main.cpp > CMakeFiles/index.dir/src/main.cpp.i
+	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/daniel/Code/subway/src/main.cpp > CMakeFiles/index.dir/src/main.cpp.i
 
 CMakeFiles/index.dir/src/main.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/index.dir/src/main.cpp.s"
-	/Users/daniel/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/daniel/Code/subway/src/main.cpp -o CMakeFiles/index.dir/src/main.cpp.s
+	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/daniel/Code/subway/src/main.cpp -o CMakeFiles/index.dir/src/main.cpp.s
 
 CMakeFiles/index.dir/src/stage.cpp.o: CMakeFiles/index.dir/flags.make
-CMakeFiles/index.dir/src/stage.cpp.o: CMakeFiles/index.dir/includes_CXX.rsp
 CMakeFiles/index.dir/src/stage.cpp.o: /Users/daniel/Code/subway/src/stage.cpp
 CMakeFiles/index.dir/src/stage.cpp.o: CMakeFiles/index.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/daniel/Code/subway/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/index.dir/src/stage.cpp.o"
-	/Users/daniel/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/index.dir/src/stage.cpp.o -MF CMakeFiles/index.dir/src/stage.cpp.o.d -o CMakeFiles/index.dir/src/stage.cpp.o -c /Users/daniel/Code/subway/src/stage.cpp
+	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/index.dir/src/stage.cpp.o -MF CMakeFiles/index.dir/src/stage.cpp.o.d -o CMakeFiles/index.dir/src/stage.cpp.o -c /Users/daniel/Code/subway/src/stage.cpp
 
 CMakeFiles/index.dir/src/stage.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/index.dir/src/stage.cpp.i"
-	/Users/daniel/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/daniel/Code/subway/src/stage.cpp > CMakeFiles/index.dir/src/stage.cpp.i
+	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/daniel/Code/subway/src/stage.cpp > CMakeFiles/index.dir/src/stage.cpp.i
 
 CMakeFiles/index.dir/src/stage.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/index.dir/src/stage.cpp.s"
-	/Users/daniel/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/daniel/Code/subway/src/stage.cpp -o CMakeFiles/index.dir/src/stage.cpp.s
+	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/daniel/Code/subway/src/stage.cpp -o CMakeFiles/index.dir/src/stage.cpp.s
 
 CMakeFiles/index.dir/src/subway.cpp.o: CMakeFiles/index.dir/flags.make
-CMakeFiles/index.dir/src/subway.cpp.o: CMakeFiles/index.dir/includes_CXX.rsp
 CMakeFiles/index.dir/src/subway.cpp.o: /Users/daniel/Code/subway/src/subway.cpp
 CMakeFiles/index.dir/src/subway.cpp.o: CMakeFiles/index.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/Users/daniel/Code/subway/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/index.dir/src/subway.cpp.o"
-	/Users/daniel/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/index.dir/src/subway.cpp.o -MF CMakeFiles/index.dir/src/subway.cpp.o.d -o CMakeFiles/index.dir/src/subway.cpp.o -c /Users/daniel/Code/subway/src/subway.cpp
+	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -MD -MT CMakeFiles/index.dir/src/subway.cpp.o -MF CMakeFiles/index.dir/src/subway.cpp.o.d -o CMakeFiles/index.dir/src/subway.cpp.o -c /Users/daniel/Code/subway/src/subway.cpp
 
 CMakeFiles/index.dir/src/subway.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing CXX source to CMakeFiles/index.dir/src/subway.cpp.i"
-	/Users/daniel/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/daniel/Code/subway/src/subway.cpp > CMakeFiles/index.dir/src/subway.cpp.i
+	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /Users/daniel/Code/subway/src/subway.cpp > CMakeFiles/index.dir/src/subway.cpp.i
 
 CMakeFiles/index.dir/src/subway.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling CXX source to assembly CMakeFiles/index.dir/src/subway.cpp.s"
-	/Users/daniel/emsdk/upstream/emscripten/em++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/daniel/Code/subway/src/subway.cpp -o CMakeFiles/index.dir/src/subway.cpp.s
+	g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /Users/daniel/Code/subway/src/subway.cpp -o CMakeFiles/index.dir/src/subway.cpp.s
 
 # Object files for target index
 index_OBJECTS = \
@@ -126,19 +123,17 @@ index_OBJECTS = \
 # External object files for target index
 index_EXTERNAL_OBJECTS =
 
-index.html: CMakeFiles/index.dir/src/main.cpp.o
-index.html: CMakeFiles/index.dir/src/stage.cpp.o
-index.html: CMakeFiles/index.dir/src/subway.cpp.o
-index.html: CMakeFiles/index.dir/build.make
-index.html: /Users/daniel/Code/subway/lib/libraylibweb.a
-index.html: CMakeFiles/index.dir/linkLibs.rsp
-index.html: CMakeFiles/index.dir/objects1.rsp
-index.html: CMakeFiles/index.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/daniel/Code/subway/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable index.html"
+index: CMakeFiles/index.dir/src/main.cpp.o
+index: CMakeFiles/index.dir/src/stage.cpp.o
+index: CMakeFiles/index.dir/src/subway.cpp.o
+index: CMakeFiles/index.dir/build.make
+index: /Users/daniel/Code/subway/lib/libraylibmac.a
+index: CMakeFiles/index.dir/link.txt
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/Users/daniel/Code/subway/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable index"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/index.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
-CMakeFiles/index.dir/build: index.html
+CMakeFiles/index.dir/build: index
 .PHONY : CMakeFiles/index.dir/build
 
 CMakeFiles/index.dir/clean:

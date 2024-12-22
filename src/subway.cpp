@@ -50,7 +50,7 @@ void AutoMoveSubway(Subway& subway, float& timer, float& hold, float dt){
         float d  = abs(subway.head.z);
         subway.distance = d;
     }
-    //std::cout << subway.turn << std::endl;
+
     if (hold > 0.0f){
         hold -= dt;
         switch(subway.turn){

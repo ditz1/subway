@@ -4,7 +4,7 @@
 o 
 
 # material
-mtllib subwayhead.vox.mtl
+mtllib head.mtl
 usemtl palette
 
 # normals

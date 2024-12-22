@@ -4,7 +4,7 @@
 o 
 
 # material
-mtllib subwaycar.vox.mtl
+mtllib car.mtl
 usemtl palette
 
 # normals
