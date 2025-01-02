@@ -1,3 +1,0 @@
-"C:\Program Files\CMake\bin\cmake.exe" -E rm -f CMakeFiles\index.dir/objects.a
-C:\ProgramData\mingw64\mingw64\bin\ar.exe qc CMakeFiles\index.dir/objects.a @CMakeFiles\index.dir\objects1.rsp
-g++ -Wl,--whole-archive CMakeFiles\index.dir/objects.a -Wl,--no-whole-archive -o index.exe -Wl,--out-implib,libindex.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\index.dir\linkLibs.rsp

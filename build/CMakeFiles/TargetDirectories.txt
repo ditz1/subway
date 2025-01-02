@@ -1,3 +1,0 @@
-C:/Users/ditzb/code-projects/subway/build/CMakeFiles/index.dir
-C:/Users/ditzb/code-projects/subway/build/CMakeFiles/edit_cache.dir
-C:/Users/ditzb/code-projects/subway/build/CMakeFiles/rebuild_cache.dir

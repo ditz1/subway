@@ -12,7 +12,7 @@ void InitStagePiece(StagePiece& curr, StagePiece prev) {
     curr.id = prev.id + 1;
     
     // Initialize grid for this piece
-    curr.grid.size = 0.25f;
+    curr.grid.size = 1.20f;
     InitGrid(curr.grid, 40, curr.grid.size);
     RandomizePermutation(curr.grid);
     GenerateNoiseEx(curr.grid, GREEN, BROWN, BLUE, 0.08f);
@@ -38,12 +38,12 @@ void DrawPathMarkers(const Grid& grid, const std::vector<Vector2>& path) {
 void DrawStagePiece(StagePiece& piece) {
     DrawPlane(piece.position, (Vector2){(float)piece.width, (float)piece.height}, GREEN);
     // Draw grid cubes with offsete
-    float scalar = 4.0f;
+    float scalar = 1.0f;
     float size = piece.grid.size;
     for (int i = 0; i < piece.grid.draw_positions.size(); i++) {
         Vector3 pos = Vector3Add(piece.grid.draw_positions[i], piece.position);
-        DrawCube(pos, size * scalar, size * 1.5f, size * scalar, piece.grid.cells[i].color);
-        DrawCubeWires(pos, size * scalar, size * 1.5f, size * scalar, GRAY);
+        DrawCube(pos, size * scalar, scalar, size * scalar, piece.grid.cells[i].color);
+        DrawCubeWires(pos, size * scalar, scalar, size * scalar, GRAY);
     }
     
     // Draw path markers with offset
@@ -53,7 +53,7 @@ void DrawStagePiece(StagePiece& piece) {
         for (size_t i = 0; i < piece.path.size(); i++) {
             int index = (int)(piece.path[i].y * sqrt(piece.grid.draw_positions.size()) + piece.path[i].x);
             Vector3 pos = Vector3Add(piece.grid.draw_positions[index], piece.position);
-            DrawCube(pos, piece.grid.size * 1.2f, piece.grid.size * 2.0f, piece.grid.size * 1.2f, debug_path);
+            DrawCube(pos, piece.grid.size * 1.2f, piece.grid.size * 1.2f, piece.grid.size * 1.2f, debug_path);
         }
     }
 }
