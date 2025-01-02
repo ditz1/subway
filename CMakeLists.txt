@@ -79,7 +79,7 @@ if(EMSCRIPTEN)
 else()
     # Native platform libraries
     if(WIN32)
-        target_link_libraries(index -lwinmm -lgdi32 -lopengl32)
+        target_link_libraries(index -lwinmm -lgdi32 -lopengl32 -lstdc++)
     elseif(APPLE)
         target_link_libraries(index "-framework OpenGL" "-framework Cocoa" "-framework IOKit")
     else()
