@@ -1,12 +1,14 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/index.dir/src/main.cpp.o"
-  "CMakeFiles/index.dir/src/main.cpp.o.d"
-  "CMakeFiles/index.dir/src/stage.cpp.o"
-  "CMakeFiles/index.dir/src/stage.cpp.o.d"
-  "CMakeFiles/index.dir/src/subway.cpp.o"
-  "CMakeFiles/index.dir/src/subway.cpp.o.d"
-  "index"
+  "CMakeFiles/index.dir/src/main.cpp.obj"
+  "CMakeFiles/index.dir/src/main.cpp.obj.d"
+  "CMakeFiles/index.dir/src/stage.cpp.obj"
+  "CMakeFiles/index.dir/src/stage.cpp.obj.d"
+  "CMakeFiles/index.dir/src/subway.cpp.obj"
+  "CMakeFiles/index.dir/src/subway.cpp.obj.d"
+  "index.exe"
+  "index.exe.manifest"
   "index.pdb"
+  "libindex.dll.a"
 )
 
 # Per-language clean rules from dependency scanning.
