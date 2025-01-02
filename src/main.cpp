@@ -100,6 +100,35 @@ Color LerpColor(Color a, Color b, float t) {
   };
 }
 
+void UpdateSubwayPath(Subway& subway, const std::vector<StagePiece>& pieces) {
+    // find which stage piece the subway is currently on
+    // all pieces should have the same dimensions and detection points
+    Vector3 x = pieces[subway.current_stage_piece_index].position;
+    x.z -= (pieces[0].width / 2.0f) - 5.0f;
+
+    int i = subway.current_stage_piece_index;
+    if (subway.head.z < x.z && pieces.size() > 1) {
+        subway.current_stage_piece_index = i + 1;
+        subway.current_path_index = 0;
+    }
+
+
+
+    // for (size_t i = 0; i < pieces.size(); i++) {
+    //     Vector3 x = pieces[subway.current_stage_piece_index].position;
+    //     x.z -= (pieces[0].width / 2.0f) - 5.0f;
+    //     if (abs(subway.head.z) > abs(pieces[i].position.z) && // beginning
+    //         abs(subway.head.z) <= abs(x.z)) { // end detection
+    //         if (subway.current_stage_piece_index != i) {
+    //             subway.current_stage_piece_index = i;
+    //             subway.current_path_index = 0;  // Reset path index for new piece
+    //             std::cout << "switching to piece " << i << std::endl;
+    //         }
+    //         break;
+    //     }
+    // }
+}
+
 void GenerateNoiseEx(Grid& grid, Color high, Color mid, Color low, float scale=0.08f) {
   for (auto& cell : grid.cells) {
       float nx = cell.grid_pos.x * scale;
@@ -125,6 +154,8 @@ void PollCameraControls(Camera3D &cam) {
     if (IsKeyDown(KEY_RIGHT)) cam.target.x += 0.1f;
     if (IsKeyDown(KEY_COMMA)) cam.target.z += 0.1f;
     if (IsKeyDown(KEY_PERIOD)) cam.target.z -= 0.1f;
+    if (IsKeyDown(KEY_LEFT_BRACKET)) cam.position.x -= 0.1f;
+    if (IsKeyDown(KEY_RIGHT_BRACKET)) cam.position.x += 0.1f; 
 
     if (IsKeyPressed(KEY_SLASH)) {
         cam.position = (Vector3){19.00f, 17.70f, 7.50f};
@@ -152,7 +183,7 @@ int main() {
     camera.position = (Vector3){4.0f, 4.0f, 4.0f};
     camera.projection = CAMERA_PERSPECTIVE;
 
-    Vector3 cam_start = {15.00f, 17.70f, 7.50f};
+    Vector3 cam_start = {25.00f, 27.70f, 7.50f};
     Subway subway;
     subway.head = (Vector3){0.0f, 0.0f, 0.0f};
     camera.position = cam_start;
@@ -162,7 +193,19 @@ int main() {
     StagePiece initial_piece;
     initial_piece.position = (Vector3){0.0f, 0.0f, 0.0f};
     initial_piece.id = 0;
+    initial_piece.width = piece_width;
+    initial_piece.height = piece_height;
     initial_piece.detection_line = initial_piece.position.z;
+
+    initial_piece.grid.size = 1.00f;
+    InitGrid(initial_piece.grid, 64, initial_piece.grid.size);
+    RandomizePermutation(initial_piece.grid);
+    GenerateNoiseEx(initial_piece.grid, GREEN, BROWN, BLUE, 0.08f);
+
+    int start[2] = {64, 32};
+    int end[2] = {0, 32};
+    initial_piece.path = PathFinder::FindPath(initial_piece.grid, start, end);
+
     stage_pieces.push_back(initial_piece);
 
     int subway_length = 5;
@@ -173,20 +216,28 @@ int main() {
     shader.locs[SHADER_LOC_VECTOR_VIEW] = GetShaderLocation(shader, "viewPos");
 
     int ambientLoc = GetShaderLocation(shader, "ambient");
-    SetShaderValue(shader, ambientLoc, (float[4]){0.3f, 0.3f, 0.3f, 1.0f}, SHADER_UNIFORM_VEC3);
+    float ambient[4] = {0.3f, 0.3f, 0.3f, 1.0f};
+    SetShaderValue(shader, ambientLoc, ambient, SHADER_UNIFORM_VEC3);
 
     Light subwayLight = CreateLight(LIGHT_POINT, Vector3Add(subway.head, (Vector3){-12.0f, 0.0f, 0.0f}), Vector3Zero(), WHITE, shader);
 
     float move_timer = 0.0f;
     float hold_timer = 0.0f;
     float dt = 1.0f / 60.0f;
-
+    
+    // UpdateStagePieces(stage_pieces, subway.head);
+    // UpdateSubway(subway);
+    
     while (!WindowShouldClose()) {
-        AutoMoveSubway(subway, move_timer, hold_timer, dt);
+        UpdateSubwayPath(subway, stage_pieces);
+        FollowPath(subway, stage_pieces);
+        //AutoMoveSubwayLite(subway, move_timer, hold_timer, dt);
         PollCameraControls(camera);
         UpdateCamera(camera, subway.head, offset);
         UpdateStagePieces(stage_pieces, subway.head);
         UpdateSubway(subway);
+        Vector3 x = stage_pieces[subway.current_stage_piece_index].position;
+        x.z -= (stage_pieces[0].width / 2.0f) - 5.0f;
 
         subwayLight.position = Vector3Add(subway.head, (Vector3){7.0f, 2.0f, 8.0f});
 
@@ -198,14 +249,15 @@ int main() {
         BeginDrawing();
             ClearBackground(BLUE);
             BeginMode3D(camera);
-                DrawGrid(32, 2.0f);
+
+                DrawLine3D(subway.head, subway.last_pos, RED);
+                DrawGrid(40, 1.2f);
                 BeginShaderMode(shader);
                     DrawSubway(subway);
                 EndShaderMode();
                 DrawStagePieces(stage_pieces);
-
-                //DrawSphere(subwayLight.position, 2.0f, subwayLight.color);
-
+                DrawSphere(x, 2.5f, RED);
+                //printf("%f %f %f\n", x.x, x.y, x.z);
             EndMode3D();
             DrawDebug(camera, subway, stage_pieces);
         EndDrawing();

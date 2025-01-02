@@ -4,6 +4,7 @@
 #include <shared.hpp>
 #include <queue>
 #include <unordered_map>
+#include <algorithm>
 #include <cmath>
 
 struct Node {

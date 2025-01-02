@@ -12,14 +12,14 @@ void InitStagePiece(StagePiece& curr, StagePiece prev) {
     curr.id = prev.id + 1;
     
     // Initialize grid for this piece
-    curr.grid.size = 1.20f;
-    InitGrid(curr.grid, 40, curr.grid.size);
+    curr.grid.size = 1.00f;
+    InitGrid(curr.grid, 64, curr.grid.size);
     RandomizePermutation(curr.grid);
     GenerateNoiseEx(curr.grid, GREEN, BROWN, BLUE, 0.08f);
     
     // Generate path
-    int start[2] = {0, 20};
-    int end[2] = {40, 20};
+    int start[2] = {64, 32};
+    int end[2] = {0, 32};
     curr.path = PathFinder::FindPath(curr.grid, start, end);
 }
 
@@ -33,6 +33,7 @@ void DrawPathMarkers(const Grid& grid, const std::vector<Vector2>& path) {
         DrawCube(pos, grid.size * 1.2f, grid.size * 2.0f, grid.size * 1.2f, debug_path);
     }
 }
+
 
 
 void DrawStagePiece(StagePiece& piece) {
@@ -86,5 +87,8 @@ void UpdateStagePieces(std::vector<StagePiece>& pieces, Vector3 subway_head) {
                 pieces.push_back(newPiece);
             }
         }
+    }
+    if (pieces.size() > 3) {
+        pieces.erase(pieces.begin());
     }
 }

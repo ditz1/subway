@@ -20,6 +20,9 @@ struct Subway {
     GridPosition grid_pos; // head
     float car_scale = 1.5f;
     std::vector<SubwayCar> trailing_cars;
+    std::vector<Vector2> current_path;
+    size_t current_path_index = 0;
+    size_t current_stage_piece_index = 0;
     Model head_model;
     Model car_model;
     Texture2D head_texture;
@@ -36,3 +39,4 @@ void AddCar(Subway& subway);
 void InitSubway(Subway& subway, int num_cars);
 void UpdateSubway(Subway& subway);
 void AutoMoveSubway(Subway& subway, float& timer, float& hold, float dt);
+void AutoMoveSubwayLite(Subway& subway, float& timer, float& hold, float dt);

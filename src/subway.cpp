@@ -31,7 +31,24 @@ void AddCar(Subway& subway){
     subway.trailing_cars.push_back(new_car);
 }
 
+void AutoMoveSubwayLite(Subway& subway, float& timer, float& hold, float dt) {
+    // Only handle the forward (z) movement here
+    if (subway.head_vel.z > -3.0f) {
+        subway.head_vel.z -= 0.1f;
+    }
+
+    timer += dt;
+    if (timer > 2.0f) {
+        float d = abs(subway.head.z);
+        subway.distance = d;
+    }
+}
+
 void AutoMoveSubway(Subway& subway, float& timer, float& hold, float dt){
+    if (!subway.current_path.empty()){
+        std::cout << "Following path" << std::endl;
+    }
+    
     if (subway.head_vel.z > -3.0f){
         subway.head_vel.z -= 0.1f;
     }
@@ -116,6 +133,8 @@ void InitSubway(Subway& subway, int num_cars){
     }
 }
 
+
+
 void UpdateSubway(Subway& subway) {
     subway.last_pos = subway.head;
     subway.head = Vector3Add(subway.head, Vector3Scale(subway.head_vel, dt));
@@ -141,33 +160,36 @@ void UpdateSubway(Subway& subway) {
     }
 }
 
-void FollowPath(Subway& subway, const std::vector<Vector2>& path, const Grid& grid) {
+void FollowPath(Subway& subway, const std::vector<StagePiece>& pieces) {
+    if (pieces.empty()) return;
+
+    
+    const auto& current_piece = pieces[subway.current_stage_piece_index];
+    const auto& path = current_piece.path;
     if (path.empty()) return;
     
-    // Find current path segment
-    int current_segment = 0;
-    float min_dist = INFINITY;
-    Vector3 current_pos = subway.head;
+    // Get next target position
+    size_t next_index = (subway.current_path_index + 1) % path.size();
+    int path_index = (int)(path[next_index].y * sqrt(current_piece.grid.draw_positions.size()) + path[next_index].x);
+    Vector3 target_pos = Vector3Add(
+        current_piece.grid.draw_positions[path_index], 
+        current_piece.position
+    );
     
-    for (size_t i = 0; i < path.size(); i++) {
-        int index = (int)(path[i].y * sqrt(grid.draw_positions.size()) + path[i].x);
-        Vector3 path_pos = grid.draw_positions[index];
-        float dist = Vector3Distance(current_pos, path_pos);
-        if (dist < min_dist) {
-            min_dist = dist;
-            current_segment = i;
-        }
+    
+    // Calculate direction and distance to target
+    Vector3 direction = Vector3Subtract(target_pos, subway.head);
+    Vector3 normalized_dir = Vector3Normalize(direction);
+    
+    // Set velocity directly towards target
+    float speed = 12.0f;
+    subway.head_vel = Vector3Scale(normalized_dir, speed);
+    
+    // Update rotation to face movement direction
+    subway.head_rotation = atan2f(direction.x, direction.z) * RAD2DEG;
+    
+    // Move to next path point if close enough
+    if (Vector3Distance(subway.head, target_pos) < 0.5f) {
+        subway.current_path_index = next_index;
     }
-    
-    // Get target position (next point in path)
-    int next_segment = (current_segment + 1) % path.size();
-    int target_index = (int)(path[next_segment].y * sqrt(grid.draw_positions.size()) + path[next_segment].x);
-    Vector3 target_pos = grid.draw_positions[target_index];
-    
-    // Calculate direction to target
-    Vector3 direction = Vector3Normalize(Vector3Subtract(target_pos, current_pos));
-    
-    // Update subway velocity
-    float speed = 3.0f;
-    subway.head_vel = Vector3Scale(direction, speed);
 }
