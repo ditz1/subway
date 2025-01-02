@@ -1,7 +1,7 @@
 #include <stage.hpp>
 
 
-void InitStagePiece(StagePiece& curr, StagePiece prev) {
+void InitStagePiece(std::vector<StagePiece>& pieces, StagePiece& curr, StagePiece prev){
     curr.position = prev.position;
     curr.position.z -= prev.height;
     curr.width = piece_width;
@@ -74,21 +74,21 @@ void DrawGridCubes(Grid& grid){
     }
 }
 
-void UpdateStagePieces(std::vector<StagePiece>& pieces, Vector3 subway_head) {
-    for (size_t i = 0; i < pieces.size(); ++i) {
-        auto& piece = pieces[i];
+// void UpdateStagePieces(std::vector<StagePiece>& pieces, Vector3 subway_head, Subway& subway) {
+//     for (size_t i = 0; i < pieces.size(); ++i) {
+//         auto& piece = pieces[i];
 
-        if (!piece.detect_line_crossed && abs(subway_head.z) > abs(piece.detection_line)) {
-            piece.detect_line_crossed = true;
+//         if (!piece.detect_line_crossed && abs(subway_head.z) > abs(piece.detection_line)) {
+//             piece.detect_line_crossed = true;
 
-            if (i == pieces.size() - 1) {
-                StagePiece newPiece;
-                InitStagePiece(newPiece, piece);
-                pieces.push_back(newPiece);
-            }
-        }
-    }
-    if (pieces.size() > 3) {
-        pieces.erase(pieces.begin());
-    }
-}
+//             if (i == pieces.size() - 1) {
+//                 StagePiece newPiece;
+//                 InitStagePiece(newPiece, piece);
+//                 pieces.push_back(newPiece);
+//             }
+//         }
+//     }
+//     if (pieces.size() > 3) {
+//         pieces.erase(pieces.begin());
+//     }
+// }

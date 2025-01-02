@@ -1,7 +1,7 @@
 #version 100
 precision mediump float;
 
-#define MAX_CUBES 16384
+#define MAX_CUBES 10
 #define AA 1   // Anti-aliasing level
 
 // Input vertex attributes

@@ -13,7 +13,7 @@
     #define GLSL_VERSION 100
 #endif
 
-#define MAX_CUBES 16384
+#define MAX_CUBES 10
 
 Vector3 Lerp(Vector3 start, Vector3 end, float amount = 0.5f) {
     return Vector3Add(start, Vector3Scale(Vector3Subtract(end, start), amount));
@@ -103,32 +103,59 @@ Color LerpColor(Color a, Color b, float t) {
 }
 
 void UpdateSubwayPath(Subway& subway, const std::vector<StagePiece>& pieces) {
-    // find which stage piece the subway is currently on
-    // all pieces should have the same dimensions and detection points
-    Vector3 x = pieces[subway.current_stage_piece_index].position;
-    x.z -= (pieces[0].width / 2.0f) - 5.0f;
-
-    int i = subway.current_stage_piece_index;
-    if (subway.head.z < x.z && pieces.size() > 1) {
-        subway.current_stage_piece_index = i + 1;
-        subway.current_path_index = 0;
+    if (pieces.empty()) {
+        return;
     }
 
+    // Get current piece bounds
+    const StagePiece& current = pieces[subway.current_stage_piece_index];
+    Vector3 piece_end = current.position;
+    piece_end.z -= (piece_width / 2.0f) - 5.0f;
+    Vector3 piece_start = piece_end;
+    piece_start.z += piece_width - 5.0f;
 
+    // Check if subway has moved past current piece
+    if (abs(subway.head.z) >= abs(piece_end.z)){
+        std::cout << "Subway has moved past current piece" << std::endl;
+        // Only advance if we have a next piece available
+            if (pieces.size() == 2){
+                subway.current_stage_piece_index+=1;
+            } else if (pieces.size() == 3){
+                if (subway.current_stage_piece_index == 2){
+                    subway.current_stage_piece_index--;
+                } else if (subway.current_stage_piece_index == 1){
+                    subway.current_stage_piece_index+=1;
+                }
+            }
+            subway.current_path_index = 0;
+    } else {
+        std::cout << "Subway has not moved past current piece" << std::endl;
+    }
+}
 
-    // for (size_t i = 0; i < pieces.size(); i++) {
-    //     Vector3 x = pieces[subway.current_stage_piece_index].position;
-    //     x.z -= (pieces[0].width / 2.0f) - 5.0f;
-    //     if (abs(subway.head.z) > abs(pieces[i].position.z) && // beginning
-    //         abs(subway.head.z) <= abs(x.z)) { // end detection
-    //         if (subway.current_stage_piece_index != i) {
-    //             subway.current_stage_piece_index = i;
-    //             subway.current_path_index = 0;  // Reset path index for new piece
-    //             std::cout << "switching to piece " << i << std::endl;
-    //         }
-    //         break;
-    //     }
-    // }
+void UpdateStagePieces(std::vector<StagePiece>& pieces, Vector3 subway_head, Subway& subway) {
+    if (pieces.empty()) return;
+
+    // Check the last piece for crossing
+    StagePiece& last_piece = pieces.back();
+    if (!last_piece.detect_line_crossed && 
+        abs(subway_head.z) > abs(last_piece.detection_line)) {
+        
+        last_piece.detect_line_crossed = true;
+        
+        // Create new piece
+        StagePiece new_piece;
+        InitStagePiece(pieces, new_piece, last_piece);
+        pieces.push_back(new_piece);
+    }
+
+    // Remove oldest piece if we have too many
+    if (pieces.size() > 3) {
+        pieces.erase(pieces.begin());
+        if (subway.current_stage_piece_index == 2) {
+            subway.current_stage_piece_index--;
+        }
+    }
 }
 
 void GenerateNoiseEx(Grid& grid, Color high, Color mid, Color low, float scale=0.08f) {
@@ -225,10 +252,12 @@ int main() {
         //AutoMoveSubwayLite(subway, move_timer, hold_timer, dt);
         PollCameraControls(camera);
         UpdateCamera(camera, subway.head, offset);
-        UpdateStagePieces(stage_pieces, subway.head);
+        UpdateStagePieces(stage_pieces, subway.head, subway);
         UpdateSubway(subway);
         Vector3 x = stage_pieces[subway.current_stage_piece_index].position;
         x.z -= (stage_pieces[0].width / 2.0f) - 5.0f;
+        Vector3 z = x;
+        z.z += stage_pieces[0].width - 5.0f;
 
 
         BeginDrawing();
@@ -240,6 +269,7 @@ int main() {
                 DrawStagePieces(stage_pieces);
                 //DrawStagePieces(stage_pieces);
                 DrawSphere(x, 2.5f, RED);
+                DrawSphere(z, 2.5f, GREEN);
                 //printf("%f %f %f\n", x.x, x.y, x.z);
             EndMode3D();
             DrawDebug(camera, subway, stage_pieces);

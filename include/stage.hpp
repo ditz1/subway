@@ -12,7 +12,7 @@ static int piece_height = 64;
 void InitStagePiece(std::vector<StagePiece>& pieces, StagePiece& curr, StagePiece prev);
 void DrawStagePiece(StagePiece& piece);
 void DrawStagePieces(std::vector<StagePiece>& pieces);
-void UpdateStagePieces(std::vector<StagePiece>& pieces, Vector3 subway_head);
+void UpdateStagePieces(std::vector<StagePiece>& pieces, Vector3 subway_head, Subway& subway);
 void InitGrid(Grid& grid, int slices, float spacing);
 void RandomizePermutation(Grid& grid);
 void GenerateNoise(Grid& grid);
