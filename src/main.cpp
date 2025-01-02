@@ -13,6 +13,8 @@
     #define GLSL_VERSION 100
 #endif
 
+#define MAX_CUBES 16384
+
 Vector3 Lerp(Vector3 start, Vector3 end, float amount = 0.5f) {
     return Vector3Add(start, Vector3Scale(Vector3Subtract(end, start), amount));
 }
@@ -168,18 +170,30 @@ int main() {
     int subway_length = 5;
     InitSubway(subway, subway_length);
 
-    Shader shader = LoadShader(TextFormat("../assets/shaders/glsl%i/lighting.vs", GLSL_VERSION),
-                               TextFormat("../assets/shaders/glsl%i/lighting.fs", GLSL_VERSION));
-    shader.locs[SHADER_LOC_VECTOR_VIEW] = GetShaderLocation(shader, "viewPos");
+    Shader shader = LoadShader(0, "../assets/shaders/raymarching.fs");
 
-    int ambientLoc = GetShaderLocation(shader, "ambient");
-    SetShaderValue(shader, ambientLoc, (float[4]){0.3f, 0.3f, 0.3f, 1.0f}, SHADER_UNIFORM_VEC3);
+    int viewEyeLoc    = GetShaderLocation(shader, "viewEye");
+    int viewCenterLoc = GetShaderLocation(shader, "viewCenter");
+    int resolutionLoc = GetShaderLocation(shader, "resolution");
+    int lightPosLoc   = GetShaderLocation(shader, "lightPos");
+    int numCubesLoc   = GetShaderLocation(shader, "numCubes");
+    int cubePosLoc    = GetShaderLocation(shader, "cubePositions");
+    int cubeSizeLoc   = GetShaderLocation(shader, "cubeSizes");
+    int cubeColorsLoc = GetShaderLocation(shader, "cubeColors");
 
-    Light subwayLight = CreateLight(LIGHT_POINT, Vector3Add(subway.head, (Vector3){-12.0f, 0.0f, 0.0f}), Vector3Zero(), WHITE, shader);
+    float res[2] = {float(screenWidth), float(screenHeight)};
+    SetShaderValue(shader, resolutionLoc, res, SHADER_UNIFORM_VEC2);
+    Vector3 lightPos = { 100.0f, 100.0f, -50.0f };
+
+    int numCubes = 0;
 
     float move_timer = 0.0f;
     float hold_timer = 0.0f;
     float dt = 1.0f / 60.0f;
+
+    Vector3 cubePositions[MAX_CUBES];
+    Vector3 cubeSizes[MAX_CUBES];
+    Vector3 cubeColors[MAX_CUBES];
 
     while (!WindowShouldClose()) {
         AutoMoveSubway(subway, move_timer, hold_timer, dt);
@@ -188,12 +202,18 @@ int main() {
         UpdateStagePieces(stage_pieces, subway.head);
         UpdateSubway(subway);
 
-        subwayLight.position = Vector3Add(subway.head, (Vector3){7.0f, 2.0f, 8.0f});
 
-        float cameraPos[3] = {camera.position.x, camera.position.y, camera.position.z};
-        SetShaderValue(shader, shader.locs[SHADER_LOC_VECTOR_VIEW], cameraPos, SHADER_UNIFORM_VEC3);
+        float cameraPos[3] = { camera.position.x, camera.position.y, camera.position.z };
+        float cameraTarget[3] = { camera.target.x, camera.target.y, camera.target.z };
 
-        UpdateLightValues(shader, subwayLight);
+        SetShaderValue(shader, viewEyeLoc, cameraPos, SHADER_UNIFORM_VEC3);
+        SetShaderValue(shader, viewCenterLoc, cameraTarget, SHADER_UNIFORM_VEC3);
+        SetShaderValue(shader, lightPosLoc, &lightPos, SHADER_UNIFORM_VEC3);
+        SetShaderValue(shader, numCubesLoc, &numCubes, SHADER_UNIFORM_INT);
+        SetShaderValueV(shader, cubePosLoc, cubePositions, SHADER_UNIFORM_VEC3, numCubes);
+        SetShaderValueV(shader, cubeSizeLoc, cubeSizes, SHADER_UNIFORM_VEC3, numCubes);
+        SetShaderValueV(shader, cubeColorsLoc, cubeColors, SHADER_UNIFORM_VEC3, numCubes);
+
 
         BeginDrawing();
             ClearBackground(BLUE);

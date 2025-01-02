@@ -5,7 +5,7 @@ file(REMOVE_RECURSE
   "CMakeFiles/index.dir/src/stage.cpp.o.d"
   "CMakeFiles/index.dir/src/subway.cpp.o"
   "CMakeFiles/index.dir/src/subway.cpp.o.d"
-  "index"
+  "index.html"
   "index.pdb"
 )
 
