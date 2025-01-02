@@ -4,6 +4,8 @@
 #include <raymath.h>
 #include <iostream>
 #include <vector>
+#include <shared.hpp>
+#include <astar.hpp>
 
 typedef struct GridPosition{
     int x;

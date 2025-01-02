@@ -25,7 +25,7 @@ struct CompareNode {
 class PathFinder {
 private:
     static float CalculateTerrainCost(float perlin_value) {
-        std::cout << perlin_value << " | ";
+        //std::cout << perlin_value << " | ";
         if (perlin_value > 0.45f) return 1.0f; // cost for high, should be easy
         if (perlin_value > 0.25f) return 50.0f; // cost mid, less prio
         if (perlin_value > 0.08f) return 1000.0f; 
@@ -110,13 +110,5 @@ public:
     }
 };
 
-void DrawPathMarkers(const Grid& grid, const std::vector<Vector2>& path) {
-    if (path.empty()) return;
-    Color debug_path = YELLOW;
-    debug_path.a = 125;
-    for (size_t i = 0; i < path.size(); i++) {
-        int index = (int)(path[i].y * sqrt(grid.draw_positions.size()) + path[i].x);
-        Vector3 pos = grid.draw_positions[index];
-        DrawCube(pos, grid.size * 1.2f, grid.size * 2.0f, grid.size * 1.2f, debug_path);
-    }
-}
+void DrawPathMarkers(const Grid& grid, const std::vector<Vector2>& path);
+

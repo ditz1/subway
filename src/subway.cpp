@@ -141,4 +141,33 @@ void UpdateSubway(Subway& subway) {
     }
 }
 
-
+void FollowPath(Subway& subway, const std::vector<Vector2>& path, const Grid& grid) {
+    if (path.empty()) return;
+    
+    // Find current path segment
+    int current_segment = 0;
+    float min_dist = INFINITY;
+    Vector3 current_pos = subway.head;
+    
+    for (size_t i = 0; i < path.size(); i++) {
+        int index = (int)(path[i].y * sqrt(grid.draw_positions.size()) + path[i].x);
+        Vector3 path_pos = grid.draw_positions[index];
+        float dist = Vector3Distance(current_pos, path_pos);
+        if (dist < min_dist) {
+            min_dist = dist;
+            current_segment = i;
+        }
+    }
+    
+    // Get target position (next point in path)
+    int next_segment = (current_segment + 1) % path.size();
+    int target_index = (int)(path[next_segment].y * sqrt(grid.draw_positions.size()) + path[next_segment].x);
+    Vector3 target_pos = grid.draw_positions[target_index];
+    
+    // Calculate direction to target
+    Vector3 direction = Vector3Normalize(Vector3Subtract(target_pos, current_pos));
+    
+    // Update subway velocity
+    float speed = 3.0f;
+    subway.head_vel = Vector3Scale(direction, speed);
+}

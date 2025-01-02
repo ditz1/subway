@@ -17,3 +17,4 @@ typedef struct Grid {
    float size;
    unsigned char permutation[256];
 } Grid;
+

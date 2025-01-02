@@ -959,6 +959,8 @@ CMakeFiles/index.dir/src/main.cpp.o: \
   /Library/Developer/CommandLineTools/SDKs/MacOSX15.1.sdk/usr/include/c++/v1/__format/formatter_tuple.h \
   /Library/Developer/CommandLineTools/SDKs/MacOSX15.1.sdk/usr/include/c++/v1/print \
   /Library/Developer/CommandLineTools/SDKs/MacOSX15.1.sdk/usr/include/unistd.h \
+  /Users/daniel/Code/subway/include/shared.hpp \
+  /Users/daniel/Code/subway/include/astar.hpp \
   /Users/daniel/Code/subway/include/debug_drawing.hpp \
   /Users/daniel/Code/subway/include/subway.hpp \
   /Users/daniel/Code/subway/include/stage.hpp \
