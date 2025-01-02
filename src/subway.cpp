@@ -37,11 +37,9 @@ void AutoMoveSubwayLite(Subway& subway, float& timer, float& hold, float dt) {
         subway.head_vel.z -= 0.1f;
     }
 
-    timer += dt;
-    if (timer > 2.0f) {
-        float d = abs(subway.head.z);
-        subway.distance = d;
-    }
+    float d = subway.head.z * -1;
+    subway.distance = d;
+    
 }
 
 void AutoMoveSubway(Subway& subway, float& timer, float& hold, float dt){
@@ -136,10 +134,13 @@ void InitSubway(Subway& subway, int num_cars){
 
 
 void UpdateSubway(Subway& subway) {
+    float d = subway.head.z * -1;
+    subway.distance = d;
+
     subway.last_pos = subway.head;
     subway.head = Vector3Add(subway.head, Vector3Scale(subway.head_vel, dt));
     Vector3 previous_position = subway.last_pos;
-    float minimum_distance = 2.0f;
+    float minimum_distance = 1.2f;
 
     Vector3 h_dir = Vector3Subtract(subway.head, subway.last_pos);
     float h_dist = Vector3Length(h_dir);
@@ -182,7 +183,7 @@ void FollowPath(Subway& subway, const std::vector<StagePiece>& pieces) {
     Vector3 normalized_dir = Vector3Normalize(direction);
     
     // Set velocity directly towards target
-    float speed = 12.0f;
+    float speed = 5.0f;
     subway.head_vel = Vector3Scale(normalized_dir, speed);
     
     // Update rotation to face movement direction

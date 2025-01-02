@@ -212,7 +212,7 @@ int main() {
     camera.position = (Vector3){4.0f, 4.0f, 4.0f};
     camera.projection = CAMERA_PERSPECTIVE;
 
-    Vector3 cam_start = {25.00f, 27.70f, 7.50f};
+    Vector3 cam_start = {15.00f, 17.70f, 7.50f};
     Subway subway;
     subway.head = (Vector3){0.0f, 0.0f, 0.0f};
     camera.position = cam_start;
