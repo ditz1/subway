@@ -213,44 +213,12 @@ int main() {
     int subway_length = 5;
     InitSubway(subway, subway_length);
 
-    Shader shader = LoadShader(0, "../assets/shaders/raymarching.fs");
-
-<<<<<<< HEAD
-    int viewEyeLoc    = GetShaderLocation(shader, "viewEye");
-    int viewCenterLoc = GetShaderLocation(shader, "viewCenter");
-    int resolutionLoc = GetShaderLocation(shader, "resolution");
-    int lightPosLoc   = GetShaderLocation(shader, "lightPos");
-    int numCubesLoc   = GetShaderLocation(shader, "numCubes");
-    int cubePosLoc    = GetShaderLocation(shader, "cubePositions");
-    int cubeSizeLoc   = GetShaderLocation(shader, "cubeSizes");
-    int cubeColorsLoc = GetShaderLocation(shader, "cubeColors");
-=======
-    int ambientLoc = GetShaderLocation(shader, "ambient");
-    float ambient[4] = {0.3f, 0.3f, 0.3f, 1.0f};
-    SetShaderValue(shader, ambientLoc, ambient, SHADER_UNIFORM_VEC3);
->>>>>>> refs/remotes/origin/main
-
-    float res[2] = {float(screenWidth), float(screenHeight)};
-    SetShaderValue(shader, resolutionLoc, res, SHADER_UNIFORM_VEC2);
-    Vector3 lightPos = { 100.0f, 100.0f, -50.0f };
-
-    int numCubes = 0;
 
     float move_timer = 0.0f;
     float hold_timer = 0.0f;
     float dt = 1.0f / 60.0f;
-<<<<<<< HEAD
 
-    Vector3 cubePositions[MAX_CUBES];
-    Vector3 cubeSizes[MAX_CUBES];
-    Vector3 cubeColors[MAX_CUBES];
 
-=======
-    
-    // UpdateStagePieces(stage_pieces, subway.head);
-    // UpdateSubway(subway);
-    
->>>>>>> refs/remotes/origin/main
     while (!WindowShouldClose()) {
         UpdateSubwayPath(subway, stage_pieces);
         FollowPath(subway, stage_pieces);
@@ -263,28 +231,14 @@ int main() {
         x.z -= (stage_pieces[0].width / 2.0f) - 5.0f;
 
 
-        float cameraPos[3] = { camera.position.x, camera.position.y, camera.position.z };
-        float cameraTarget[3] = { camera.target.x, camera.target.y, camera.target.z };
-
-        SetShaderValue(shader, viewEyeLoc, cameraPos, SHADER_UNIFORM_VEC3);
-        SetShaderValue(shader, viewCenterLoc, cameraTarget, SHADER_UNIFORM_VEC3);
-        SetShaderValue(shader, lightPosLoc, &lightPos, SHADER_UNIFORM_VEC3);
-        SetShaderValue(shader, numCubesLoc, &numCubes, SHADER_UNIFORM_INT);
-        SetShaderValueV(shader, cubePosLoc, cubePositions, SHADER_UNIFORM_VEC3, numCubes);
-        SetShaderValueV(shader, cubeSizeLoc, cubeSizes, SHADER_UNIFORM_VEC3, numCubes);
-        SetShaderValueV(shader, cubeColorsLoc, cubeColors, SHADER_UNIFORM_VEC3, numCubes);
-
-
         BeginDrawing();
             ClearBackground(BLUE);
             BeginMode3D(camera);
-
                 DrawLine3D(subway.head, subway.last_pos, RED);
                 DrawGrid(40, 1.2f);
-                BeginShaderMode(shader);
-                    DrawSubway(subway);
-                EndShaderMode();
+                DrawSubway(subway);
                 DrawStagePieces(stage_pieces);
+                //DrawStagePieces(stage_pieces);
                 DrawSphere(x, 2.5f, RED);
                 //printf("%f %f %f\n", x.x, x.y, x.z);
             EndMode3D();
@@ -292,7 +246,6 @@ int main() {
         EndDrawing();
     }
 
-    UnloadShader(shader);
     CloseWindow();
 
     return 0;

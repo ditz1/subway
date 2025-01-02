@@ -55,7 +55,6 @@ if(EMSCRIPTEN)
         -s ASYNCIFY \
         -s FORCE_FILESYSTEM=1 \
         -s INITIAL_MEMORY=268435456 \
-        -s STACK_SIZE=5242880 \
         --preload-file ../assets")
     
     target_compile_definitions(index PRIVATE ${PLATFORM_WEB})
