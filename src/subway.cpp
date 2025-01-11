@@ -125,6 +125,9 @@ void InitSubway(Subway& subway, int num_cars){
 
     subway.head = (Vector3){0.0f, 0.0f, 0.0f};
     subway.path_history.push_back(subway.head);
+    for (int i = 0; i < num_cars; i++){
+        subway.path_history.push_back(subway.head);
+    }
     subway.head_vel = (Vector3){0.0f, 0.0f, 0.0f};
     subway.grid_pos = (GridPosition){0, 0};
     subway.last_path_index = 0;
@@ -142,7 +145,7 @@ void UpdateSubway(Subway& subway) {
     subway.last_pos = subway.head;
     subway.head = Vector3Add(subway.head, Vector3Scale(subway.head_vel, dt));
     //Vector3 previous_position = subway.last_pos;
-    float minimum_distance = 0.8f;
+    float minimum_distance = 0.5f;
 
     Vector3 h_dir = Vector3Subtract(subway.head, subway.last_pos);
     float h_dist = Vector3Length(h_dir);
@@ -151,14 +154,21 @@ void UpdateSubway(Subway& subway) {
 
     for (int i = 0; i < subway.trailing_cars.size(); i++) {
         Vector3 previous_position = subway.path_history[i];
+        std::cout << i << " | " << previous_position.x << " " << previous_position.y << " " << previous_position.z << std::endl;
+        std::cout << i << " | " << subway.trailing_cars[i].position.x << " " << subway.trailing_cars[i].position.y << " " << subway.trailing_cars[i].position.z << std::endl;
+        std::cout << "----------------" << std::endl;
         Vector3 direction = Vector3Subtract(previous_position, subway.trailing_cars[i].position);
         float distance = Vector3Length(direction);
         if (distance > minimum_distance) {
             Vector3 normalized_direction = Vector3Normalize(direction);
             subway.trailing_cars[i].position = Vector3Add(subway.trailing_cars[i].position, 
                 Vector3Scale(normalized_direction, ((distance - minimum_distance)) * dt));
+        } else if (distance > 8.0f){
+            subway.trailing_cars[i].position = previous_position;
         }
         subway.trailing_cars[i].rotation = atan2f(direction.x, direction.z) * RAD2DEG;
+
+        
     }
   
 }
@@ -184,54 +194,27 @@ void FollowPath(Subway& subway, const std::vector<StagePiece>& pieces) {
         current_piece.position
     );
 
-    std::cout << path_index << std::endl;
+    //std::cout << path_index << std::endl;
 
-    subway.path_history.clear();
-
-    int trailing_car_idxs[subway.trailing_cars.size()];
-    
-    std::cout << subway.current_path_index << std::endl;
-    if (subway.current_path_index <= (path.size() - 10) || subway.current_path_index >= 40){
-        for (int i = 0; i < subway.trailing_cars.size(); i++) {
-            int spacing = 5;
-            size_t last_idx = (subway.current_path_index - (i * spacing)) % path.size();
-            subway.last_idxs[i] = last_idx;
-            std::cout << i << " | " << last_idx << std::endl;
-            int last_path_index = (int)(path[last_idx].y * sqrt(current_piece.grid.draw_positions.size()) + path[last_idx].x);
-            trailing_car_idxs[i] = last_path_index;
-        }
-
-        for (int i = 0; i < subway.trailing_cars.size(); i++) {
-            Vector3 old_target = Vector3Add(current_piece.grid.draw_positions[trailing_car_idxs[i]], current_piece.position);
-            subway.path_history.push_back(old_target);
-        }
-    } else { // crossing into new grid, just advance previous path
-        for (int i = 0; i < subway.trailing_cars.size(); i++) {
-            int last_path_index = (int)(path[subway.last_idxs[i]].y * sqrt(prev_piece.grid.draw_positions.size()) + path[subway.last_idxs[i]].x);
-            trailing_car_idxs[i] = last_path_index;
-        }
-
-        for (int i = 0; i < subway.trailing_cars.size(); i++) {
-            Vector3 old_target = Vector3Add(prev_piece.grid.draw_positions[trailing_car_idxs[i]], prev_piece.position);
-            subway.path_history.push_back(old_target);
+    //subway.path_history.clear();
+    for (int i = 0; i < subway.trailing_cars.size(); i++) {
+        if (Vector3Distance(subway.path_history.back(), target_pos) > 4.5f) {
+            subway.path_history.push_back(target_pos);
         }
     }
+    if (subway.path_history.size() > subway.trailing_cars.size()){
+        subway.path_history.erase(subway.path_history.begin());
+    }
     
-    // // situation if subway is crossing grid paths
-    // if (Vector3Distance(subway.path_history.back(), target_pos) > 2.5f) {
-    //     subway.path_history.push_back(target_pos);
-    // }
-    // if (subway.path_history.size() > subway.trailing_cars.size()){
-    //     subway.path_history.erase(subway.path_history.begin());
-    // }
+    //std::cout << subway.path_history.size() << " size" << std::endl;
     
 
     Vector3 direction = Vector3Subtract(target_pos, subway.head);
     Vector3 normalized_dir = Vector3Normalize(direction);
     
-    float speed = 8.0f;
-    if (subway.distance < 19.0f){
-        speed = 20.0f;
+    float speed = 5.0f;
+    if (subway.distance < 20.0f){
+        speed = 21.0f;
     }
     
     subway.head_vel = Vector3Scale(normalized_dir, speed);
