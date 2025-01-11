@@ -154,9 +154,9 @@ void UpdateSubway(Subway& subway) {
 
     for (int i = 0; i < subway.trailing_cars.size(); i++) {
         Vector3 previous_position = subway.path_history[i];
-        std::cout << i << " | " << previous_position.x << " " << previous_position.y << " " << previous_position.z << std::endl;
-        std::cout << i << " | " << subway.trailing_cars[i].position.x << " " << subway.trailing_cars[i].position.y << " " << subway.trailing_cars[i].position.z << std::endl;
-        std::cout << "----------------" << std::endl;
+        //std::cout << i << " | " << previous_position.x << " " << previous_position.y << " " << previous_position.z << std::endl;
+        //std::cout << i << " | " << subway.trailing_cars[i].position.x << " " << subway.trailing_cars[i].position.y << " " << subway.trailing_cars[i].position.z << std::endl;
+        //std::cout << "----------------" << std::endl;
         Vector3 direction = Vector3Subtract(previous_position, subway.trailing_cars[i].position);
         float distance = Vector3Length(direction);
         if (distance > minimum_distance) {

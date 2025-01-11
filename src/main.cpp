@@ -245,6 +245,10 @@ int main() {
     float hold_timer = 0.0f;
     float dt = 1.0f / 60.0f;
 
+    for (int i = 0; i < initial_piece.grid.cells.size(); i++) {
+        std::cout << initial_piece.grid.cells[i].perlin_value << std::endl;
+    }
+
 
     while (!WindowShouldClose()) {
         UpdateSubwayPath(subway, stage_pieces);
@@ -258,47 +262,13 @@ int main() {
         x.z -= (stage_pieces[0].width / 2.0f) - 5.0f;
         Vector3 z = x;
         z.z += stage_pieces[0].width - 5.0f;
-        std::cout << subway.path_history.size() << std::endl;
-
-         // situation if subway is crossing grid paths
-    // if (next_index < 5 || next_index > path.size() - 5){
-    //     if (Vector3Distance(subway.path_history.back(), target_pos) > 1.5f) {
-    //         subway.path_history.push_back(target_pos);
-    //     }
-    //     if (subway.path_history.size() > subway.trailing_cars.size()){
-    //         subway.path_history.erase(subway.path_history.begin());
-    //     }
-    // } else {
-        
-    // }
-
-
-    // std::cout << path_index << std::endl;
-
-    // subway.path_history.clear();
-
-    // int trailing_car_idxs[subway.trailing_cars.size()];
     
-    // std::cout << subway.current_path_index << std::endl;
-    // for (int i = 0; i < subway.trailing_cars.size(); i++) {
-    //     int spacing = 5;
-    //     size_t last_idx = (subway.current_path_index - (i * spacing)) % path.size();
-    //     std::cout << i << " | " << last_idx << std::endl;
-    //     int last_path_index = (int)(path[last_idx].y * sqrt(current_piece.grid.draw_positions.size()) + path[last_idx].x);
-    //     trailing_car_idxs[i] = last_path_index;
-    // }
-    
-
-    // for (int i = 0; i < subway.trailing_cars.size(); i++) {
-    //     Vector3 old_target = Vector3Add(current_piece.grid.draw_positions[trailing_car_idxs[i]], current_piece.position);
-    //     subway.path_history.push_back(old_target);
-    // }
 
         BeginDrawing();
             ClearBackground(BLUE);
             BeginMode3D(camera);
                 DrawLine3D(subway.head, subway.last_pos, RED);
-                DrawGrid(40, 1.2f);
+                //DrawGrid(40, 1.2f);
                 DrawSubway(subway);
                 DrawStagePieces(stage_pieces);
                 //DrawStagePieces(stage_pieces);

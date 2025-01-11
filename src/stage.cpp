@@ -37,14 +37,21 @@ void DrawPathMarkers(const Grid& grid, const std::vector<Vector2>& path) {
 
 
 void DrawStagePiece(StagePiece& piece) {
-    DrawPlane(piece.position, (Vector2){(float)piece.width, (float)piece.height}, GREEN);
+    //DrawPlane(piece.position, (Vector2){(float)piece.width, (float)piece.height}, GREEN);
     // Draw grid cubes with offsete
     float scalar = 1.0f;
     float size = piece.grid.size;
     for (int i = 0; i < piece.grid.draw_positions.size(); i++) {
         Vector3 pos = Vector3Add(piece.grid.draw_positions[i], piece.position);
-        DrawCube(pos, size * scalar, scalar, size * scalar, piece.grid.cells[i].color);
-        DrawCubeWires(pos, size * scalar, scalar, size * scalar, GRAY);
+        // height dependent on perlin value
+        float height = scalar;
+        if (piece.grid.cells[i].perlin_value > 0.5f) {
+            pos.y += 0.5f;
+        } else if (piece.grid.cells[i].perlin_value < 0.0f) {
+            pos.y -= 1.0f;
+        }
+        DrawCube(pos, size * scalar, height, size * scalar, piece.grid.cells[i].color);
+        //DrawCubeWires(pos, size * scalar, scalar, size * scalar, GRAY);
     }
     
     // Draw path markers with offset
