@@ -15,6 +15,8 @@
 
 #define MAX_CUBES 10
 
+static Vector3 cam_original_pos = {25.00f, 27.70f, 7.50f};
+
 Vector3 Lerp(Vector3 start, Vector3 end, float amount = 0.5f) {
     return Vector3Add(start, Vector3Scale(Vector3Subtract(end, start), amount));
 }
@@ -30,7 +32,7 @@ void InitGrid(Grid& grid, int slices, float spacing){
 
 
 
-Vector3 GridToWorld(Grid& grid, int p[2]) {
+Vector3 GridToWorld(Grid grid, int p[2]) {
    int grid_width = (int)sqrt(grid.draw_positions.size());
    int index = p[1] * grid_width + p[0];
    if (index < 0 || index >= grid.draw_positions.size()) {
@@ -116,7 +118,6 @@ void UpdateSubwayPath(Subway& subway, const std::vector<StagePiece>& pieces) {
 
     // Check if subway has moved past current piece
     if (abs(subway.head.z) >= abs(piece_end.z)){
-        std::cout << "Subway has moved past current piece" << std::endl;
         // Only advance if we have a next piece available
             if (pieces.size() == 2){
                 subway.current_stage_piece_index+=1;
@@ -128,8 +129,6 @@ void UpdateSubwayPath(Subway& subway, const std::vector<StagePiece>& pieces) {
                 }
             }
             subway.current_path_index = 0;
-    } else {
-        std::cout << "Subway has not moved past current piece" << std::endl;
     }
 }
 
@@ -187,7 +186,7 @@ void PollCameraControls(Camera3D &cam) {
     if (IsKeyDown(KEY_RIGHT_BRACKET)) cam.position.x += 0.1f; 
 
     if (IsKeyPressed(KEY_SLASH)) {
-        cam.position = (Vector3){19.00f, 17.70f, 7.50f};
+        cam.position = cam_original_pos;
         cam.target = (Vector3){0.0f, 0.0f, 0.0f};
     }
 }
@@ -198,11 +197,11 @@ void UpdateCamera(Camera3D &cam, Vector3 subway_head, Vector3 offset) {
 }
 
 int main() {
-    const int screenWidth = 800;
-    const int screenHeight = 450;
+    const int screenWidth = 1280;
+    const int screenHeight = 800;
     SetConfigFlags(FLAG_MSAA_4X_HINT);
 
-    InitWindow(screenWidth, screenHeight, "Subway Simulation with Lighting");
+    InitWindow(screenWidth, screenHeight, "Subway Sim");
     SetTargetFPS(60);
 
     Camera3D camera = {0};
@@ -212,7 +211,7 @@ int main() {
     camera.position = (Vector3){4.0f, 4.0f, 4.0f};
     camera.projection = CAMERA_PERSPECTIVE;
 
-    Vector3 cam_start = {15.00f, 17.70f, 7.50f};
+    Vector3 cam_start = cam_original_pos;
     Subway subway;
     subway.head = (Vector3){0.0f, 0.0f, 0.0f};
     camera.position = cam_start;
@@ -225,12 +224,13 @@ int main() {
     initial_piece.width = piece_width;
     initial_piece.height = piece_height;
     initial_piece.detection_line = initial_piece.position.z;
-
     initial_piece.grid.size = 1.00f;
+
     InitGrid(initial_piece.grid, 64, initial_piece.grid.size);
     RandomizePermutation(initial_piece.grid);
     GenerateNoiseEx(initial_piece.grid, GREEN, BROWN, BLUE, 0.08f);
 
+    // initial piece wont really work anyways but we just need to get it started
     int start[2] = {64, 32};
     int end[2] = {0, 32};
     initial_piece.path = PathFinder::FindPath(initial_piece.grid, start, end);
@@ -258,7 +258,41 @@ int main() {
         x.z -= (stage_pieces[0].width / 2.0f) - 5.0f;
         Vector3 z = x;
         z.z += stage_pieces[0].width - 5.0f;
+        std::cout << subway.path_history.size() << std::endl;
 
+         // situation if subway is crossing grid paths
+    // if (next_index < 5 || next_index > path.size() - 5){
+    //     if (Vector3Distance(subway.path_history.back(), target_pos) > 1.5f) {
+    //         subway.path_history.push_back(target_pos);
+    //     }
+    //     if (subway.path_history.size() > subway.trailing_cars.size()){
+    //         subway.path_history.erase(subway.path_history.begin());
+    //     }
+    // } else {
+        
+    // }
+
+
+    // std::cout << path_index << std::endl;
+
+    // subway.path_history.clear();
+
+    // int trailing_car_idxs[subway.trailing_cars.size()];
+    
+    // std::cout << subway.current_path_index << std::endl;
+    // for (int i = 0; i < subway.trailing_cars.size(); i++) {
+    //     int spacing = 5;
+    //     size_t last_idx = (subway.current_path_index - (i * spacing)) % path.size();
+    //     std::cout << i << " | " << last_idx << std::endl;
+    //     int last_path_index = (int)(path[last_idx].y * sqrt(current_piece.grid.draw_positions.size()) + path[last_idx].x);
+    //     trailing_car_idxs[i] = last_path_index;
+    // }
+    
+
+    // for (int i = 0; i < subway.trailing_cars.size(); i++) {
+    //     Vector3 old_target = Vector3Add(current_piece.grid.draw_positions[trailing_car_idxs[i]], current_piece.position);
+    //     subway.path_history.push_back(old_target);
+    // }
 
         BeginDrawing();
             ClearBackground(BLUE);
@@ -268,6 +302,11 @@ int main() {
                 DrawSubway(subway);
                 DrawStagePieces(stage_pieces);
                 //DrawStagePieces(stage_pieces);
+                for (int i = 0; i < subway.path_history.size(); i++) {
+                    Color a = (Color){255, 0, 0, 255};
+                    a.r -= i * 50;
+                    DrawSphere(subway.path_history[i], 1.5f, a);
+                }
                 DrawSphere(x, 2.5f, RED);
                 DrawSphere(z, 2.5f, GREEN);
                 //printf("%f %f %f\n", x.x, x.y, x.z);

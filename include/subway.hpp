@@ -16,6 +16,9 @@ struct Subway {
     Vector3 last_pos; // purely for anim
     Vector2 head_dir;
     Vector3 head_vel;
+    std::vector<Vector3> path_history;
+    int last_idxs[5];
+    int last_path_index;
     float head_rotation = 180.0f;
     GridPosition grid_pos; // head
     float car_scale = 1.5f;

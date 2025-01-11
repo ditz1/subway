@@ -13,6 +13,7 @@ typedef struct GridPosition{
 } GridPosition;
 
 Vector3 Lerp(Vector3 start, Vector3 end, float amount);
+Vector3 GridToWorld(Grid grid, int p[2]);
 
 struct StagePiece {
     Vector3 position;
