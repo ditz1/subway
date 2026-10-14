@@ -1,15 +1,26 @@
 #include <subway.hpp>
+#include <stage.hpp>
+#include <terrain.hpp>
 
 static float subway_size = 2.0f;
 static float dt = 1.0f / 60.0f;
 
-void DrawSubway(Subway& subway){
-    Vector3 car_scale = {subway.car_scale, subway.car_scale, subway.car_scale};
-    DrawModelEx(subway.head_model, subway.head, (Vector3){0.0f, 1.0f, 0.0f}, subway.head_rotation, car_scale, WHITE);
+// models face +z, tip them about their own x axis to follow the grade
+static void DrawCar(Model model, Vector3 position, float rotation, float pitch, float scale) {
+    model.transform = MatrixRotateX(-pitch * DEG2RAD);
+    DrawModelEx(model, position, (Vector3){0.0f, 1.0f, 0.0f}, rotation, (Vector3){scale, scale, scale}, WHITE);
+}
+
+void DrawSubway(Subway& subway, bool debug){
+    // same sun, shadows and fog as the terrain
+    subway.head_model.materials[0].shader = GetTerrainShader();
+    subway.car_model.materials[0].shader = GetTerrainShader();
+    DrawCar(subway.head_model, subway.head, subway.head_rotation, subway.head_pitch, subway.car_scale);
     //DrawModel(subway.head_model, subway.head, 1.0f, WHITE);
     for(int i = 0; i < subway.trailing_cars.size(); i++){
-        DrawCubeWires(subway.trailing_cars[i].position, subway_size, subway_size, subway_size, BLUE);
-        DrawModelEx(subway.car_model, subway.trailing_cars[i].position, (Vector3){0.0f, 1.0f, 0.0f}, subway.trailing_cars[i].rotation, car_scale, WHITE);
+        if (debug) DrawCubeWires(subway.trailing_cars[i].position, subway_size, subway_size, subway_size, BLUE);
+        const SubwayCar& car = subway.trailing_cars[i];
+        DrawCar(subway.car_model, car.position, car.rotation, car.pitch, subway.car_scale);
     }
 }
 
@@ -121,16 +132,14 @@ void InitSubway(Subway& subway, int num_cars){
         subway.car_texture = LoadTexture("../assets/car.png");
         subway.head_model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = subway.head_texture;
         subway.car_model.materials[0].maps[MATERIAL_MAP_DIFFUSE].texture = subway.car_texture;
+        subway.head_model.materials[0].maps[MATERIAL_MAP_METALNESS].texture = GetShadowMap();
+        subway.car_model.materials[0].maps[MATERIAL_MAP_METALNESS].texture = GetShadowMap();
+        subway.models_loaded = true;
     }
 
     subway.head = (Vector3){0.0f, 0.0f, 0.0f};
-    subway.path_history.push_back(subway.head);
-    for (int i = 0; i < num_cars; i++){
-        subway.path_history.push_back(subway.head);
-    }
     subway.head_vel = (Vector3){0.0f, 0.0f, 0.0f};
     subway.grid_pos = (GridPosition){0, 0};
-    subway.last_path_index = 0;
     for(int i = 0; i < num_cars; i++){
         AddCar(subway);
     }
@@ -138,91 +147,29 @@ void InitSubway(Subway& subway, int num_cars){
 
 
 
-void UpdateSubway(Subway& subway) {
-    float d = subway.head.z * -1;
-    subway.distance = d;
-
-    subway.last_pos = subway.head;
-    subway.head = Vector3Add(subway.head, Vector3Scale(subway.head_vel, dt));
-    //Vector3 previous_position = subway.last_pos;
-    float minimum_distance = 0.5f;
-
-    Vector3 h_dir = Vector3Subtract(subway.head, subway.last_pos);
-    float h_dist = Vector3Length(h_dir);
-    Vector3 h_norm_dir = Vector3Normalize(h_dir);
-    subway.head_rotation = atan2f(h_dir.x, h_dir.z) * RAD2DEG;
-
-    for (int i = 0; i < subway.trailing_cars.size(); i++) {
-        Vector3 previous_position = subway.path_history[i];
-        //std::cout << i << " | " << previous_position.x << " " << previous_position.y << " " << previous_position.z << std::endl;
-        //std::cout << i << " | " << subway.trailing_cars[i].position.x << " " << subway.trailing_cars[i].position.y << " " << subway.trailing_cars[i].position.z << std::endl;
-        //std::cout << "----------------" << std::endl;
-        Vector3 direction = Vector3Subtract(previous_position, subway.trailing_cars[i].position);
-        float distance = Vector3Length(direction);
-        if (distance > minimum_distance) {
-            Vector3 normalized_direction = Vector3Normalize(direction);
-            subway.trailing_cars[i].position = Vector3Add(subway.trailing_cars[i].position, 
-                Vector3Scale(normalized_direction, ((distance - minimum_distance)) * dt));
-        } else if (distance > 8.0f){
-            subway.trailing_cars[i].position = previous_position;
-        }
-        subway.trailing_cars[i].rotation = atan2f(direction.x, direction.z) * RAD2DEG;
-
-        
-    }
-  
+// Every car rides on two bogies a fixed distance apart on the track. The car sits between
+// them and points from the back one to the front one, so it stays on the rails through
+// curves and tilts with the grade
+static void PlaceOnTrack(const std::vector<StagePiece>& pieces, float s, Vector3& position, float& rotation, float& pitch) {
+    const float bogie_offset = 1.8f;
+    Vector3 front = TrackPosition(pieces, s + bogie_offset);
+    Vector3 back = TrackPosition(pieces, s - bogie_offset);
+    Vector3 dir = Vector3Subtract(front, back);
+    position = Vector3Lerp(back, front, 0.5f);
+    rotation = atan2f(dir.x, dir.z) * RAD2DEG;
+    pitch = atan2f(dir.y, sqrtf(dir.x * dir.x + dir.z * dir.z)) * RAD2DEG;
 }
 
+void UpdateSubway(Subway& subway, const std::vector<StagePiece>& pieces, float dt) {
+    const float acceleration = 1.5f;
+    subway.speed = fminf(subway.speed + acceleration * dt, subway.max_speed);
+    subway.head_s += subway.speed * dt;
+    subway.distance += subway.speed * dt;
 
-void FollowPath(Subway& subway, const std::vector<StagePiece>& pieces) {
-    if (pieces.empty()) return;
-
-    const auto& current_piece = pieces[subway.current_stage_piece_index];
-    const auto& prev_piece = pieces[subway.current_stage_piece_index - 1];
-    const auto& path = current_piece.path;
-    if (path.empty()) return;
-
-    if (subway.last_path_index == 0) {
-        subway.last_path_index = subway.current_path_index;
+    // the whole train moves as one: each car is a fixed distance behind the one in front
+    PlaceOnTrack(pieces, subway.head_s, subway.head, subway.head_rotation, subway.head_pitch);
+    for (size_t i = 0; i < subway.trailing_cars.size(); i++) {
+        SubwayCar& car = subway.trailing_cars[i];
+        PlaceOnTrack(pieces, subway.head_s - (i + 1) * subway.car_spacing, car.position, car.rotation, car.pitch);
     }
-
-    
-    size_t next_index = (subway.current_path_index + 1) % path.size();
-    int path_index = (int)(path[next_index].y * sqrt(current_piece.grid.draw_positions.size()) + path[next_index].x);
-    Vector3 target_pos = Vector3Add(
-        current_piece.grid.draw_positions[path_index], 
-        current_piece.position
-    );
-
-    //std::cout << path_index << std::endl;
-
-    //subway.path_history.clear();
-    for (int i = 0; i < subway.trailing_cars.size(); i++) {
-        if (Vector3Distance(subway.path_history.back(), target_pos) > 4.5f) {
-            subway.path_history.push_back(target_pos);
-        }
-    }
-    if (subway.path_history.size() > subway.trailing_cars.size()){
-        subway.path_history.erase(subway.path_history.begin());
-    }
-    
-    //std::cout << subway.path_history.size() << " size" << std::endl;
-    
-
-    Vector3 direction = Vector3Subtract(target_pos, subway.head);
-    Vector3 normalized_dir = Vector3Normalize(direction);
-    
-    float speed = 5.0f;
-    if (subway.distance < 20.0f){
-        speed = 21.0f;
-    }
-    
-    subway.head_vel = Vector3Scale(normalized_dir, speed);
-    
-    subway.head_rotation = atan2f(direction.x, direction.z) * RAD2DEG;
-    
-    if (Vector3Distance(subway.head, target_pos) < 0.5f) {
-        subway.current_path_index = next_index;
-    }
-
 }

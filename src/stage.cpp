@@ -1,4 +1,5 @@
 #include <stage.hpp>
+#include <terrain.hpp>
 
 
 void InitStagePiece(std::vector<StagePiece>& pieces, StagePiece& curr, StagePiece prev){
@@ -14,56 +15,49 @@ void InitStagePiece(std::vector<StagePiece>& pieces, StagePiece& curr, StagePiec
     // Initialize grid for this piece
     curr.grid.size = 1.00f;
     InitGrid(curr.grid, 64, curr.grid.size);
-    RandomizePermutation(curr.grid);
-    GenerateNoiseEx(curr.grid, GREEN, BROWN, BLUE, 0.08f);
-    
-    // Generate path
-    int start[2] = {64, 32};
-    int end[2] = {0, 32};
-    curr.path = PathFinder::FindPath(curr.grid, start, end);
+
+    // Generate terrain, path and meshes
+    BuildStagePiece(curr, false);
 }
 
-void DrawPathMarkers(const Grid& grid, const std::vector<Vector2>& path) {
-    if (path.empty()) return;
+float TrackLength(const std::vector<StagePiece>& pieces) {
+    float length = 0.0f;
+    for (const auto& piece : pieces) length += piece.track_length;
+    return length;
+}
+
+Vector3 TrackPosition(const std::vector<StagePiece>& pieces, float s) {
+    s = fmaxf(s, 0.0f);
+    for (size_t p = 0; p < pieces.size(); p++) {
+        const StagePiece& piece = pieces[p];
+        if (s > piece.track_length && p + 1 < pieces.size()) {
+            s -= piece.track_length;
+            continue;
+        }
+        s = fminf(s, piece.track_length);
+        // first track point past s, then blend from the one before it
+        size_t i = std::upper_bound(piece.track_s.begin(), piece.track_s.end(), s) - piece.track_s.begin();
+        i = std::min(std::max(i, (size_t)1), piece.track_s.size() - 1);
+        float segment = piece.track_s[i] - piece.track_s[i - 1];
+        float t = segment > 0.0f ? (s - piece.track_s[i - 1]) / segment : 0.0f;
+        return Vector3Lerp(PathPoint(piece, i - 1), PathPoint(piece, i), t);
+    }
+    return (Vector3){0.0f, 0.0f, 0.0f};
+}
+
+void DrawPathMarkers(const StagePiece& piece) {
+    if (piece.path.empty()) return;
     Color debug_path = YELLOW;
     debug_path.a = 125;
-    for (size_t i = 0; i < path.size(); i++) {
-        int index = (int)(path[i].y * sqrt(grid.draw_positions.size()) + path[i].x);
-        Vector3 pos = grid.draw_positions[index];
-        DrawCube(pos, grid.size * 1.2f, grid.size * 2.0f, grid.size * 1.2f, debug_path);
+    for (size_t i = 0; i < piece.track.size(); i++) {
+        DrawCube(PathPoint(piece, i), piece.grid.size * 1.2f, piece.grid.size * 1.2f, piece.grid.size * 1.2f, debug_path);
     }
 }
 
-
-
 void DrawStagePiece(StagePiece& piece) {
-    //DrawPlane(piece.position, (Vector2){(float)piece.width, (float)piece.height}, GREEN);
-    // Draw grid cubes with offsete
-    float scalar = 1.0f;
-    float size = piece.grid.size;
-    for (int i = 0; i < piece.grid.draw_positions.size(); i++) {
-        Vector3 pos = Vector3Add(piece.grid.draw_positions[i], piece.position);
-        // height dependent on perlin value
-        float height = scalar;
-        if (piece.grid.cells[i].perlin_value > 0.5f) {
-            pos.y += 0.5f;
-        } else if (piece.grid.cells[i].perlin_value < 0.0f) {
-            pos.y -= 1.0f;
-        }
-        DrawCube(pos, size * scalar, height, size * scalar, piece.grid.cells[i].color);
-        //DrawCubeWires(pos, size * scalar, scalar, size * scalar, GRAY);
-    }
-    
-    // Draw path markers with offset
-    if (!piece.path.empty()) {
-        Color debug_path = YELLOW;
-        debug_path.a = 125;
-        for (size_t i = 0; i < piece.path.size(); i++) {
-            int index = (int)(piece.path[i].y * sqrt(piece.grid.draw_positions.size()) + piece.path[i].x);
-            Vector3 pos = Vector3Add(piece.grid.draw_positions[index], piece.position);
-            DrawCube(pos, piece.grid.size * 1.2f, piece.grid.size * 1.2f, piece.grid.size * 1.2f, debug_path);
-        }
-    }
+    if (!piece.models_loaded) return;
+    piece.terrain.materials[0].shader = GetTerrainShader();
+    DrawModel(piece.terrain, piece.position, 1.0f, WHITE);
 }
 
 void DrawStagePieces(std::vector<StagePiece>& pieces) {
@@ -72,12 +66,10 @@ void DrawStagePieces(std::vector<StagePiece>& pieces) {
     }
 }
 
-void DrawGridCubes(Grid& grid){
-    Color debug_color = Color{235, 235, 235, 40};
-    for (int i = 0; i < grid.draw_positions.size(); i++){
-        DrawCube(grid.draw_positions[i], grid.size, grid.size, grid.size, grid.cells[i].color);
-        DrawCubeWires(grid.draw_positions[i], grid.size, grid.size, grid.size, debug_color);
-       
+// water is see-through so it has to go down after everything solid
+void DrawStageWater(std::vector<StagePiece>& pieces) {
+    for (auto& piece : pieces) {
+        if (piece.has_water) DrawModel(piece.water, piece.position, 1.0f, WHITE);
     }
 }
 
