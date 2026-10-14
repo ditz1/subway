@@ -80,6 +80,12 @@ int main() {
     InitWindow(screenWidth, screenHeight, "Subway Sim");
     SetTargetFPS(60);
 
+#if !defined(PLATFORM_WEB)
+    // assets are found at ../assets from the executable, so work from its folder no matter
+    // where the program was started from
+    ChangeDirectory(GetApplicationDirectory());
+#endif
+
     // a new world every run, set SUBWAY_SEED to get the same one back
     const char* seed_env = getenv("SUBWAY_SEED");
     int seed = seed_env ? atoi(seed_env) : GetRandomValue(0, 1 << 30);
